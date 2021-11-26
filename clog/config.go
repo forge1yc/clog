@@ -28,15 +28,37 @@ type LogConfig struct {
 	CW    ConfConsoleWriter `json:"ConsoleWriter"`
 }
 
-
-
 func SetupLogWithConf(file string) (err error) {
 	var lc LogConfig
 
 	cnt, err := ioutil.ReadFile(file)
 	if err != nil {
-		return err
+		// 未指定格式，加载默认配置，配置位置为clog/defaultSettings/default_settings.json内容
+		cnt = []byte(`{
+			"LogLevel":"info",
+
+			"FileWriter":{
+			"On" : true,
+				"DeleteCycle": 2592000,
+
+				"Root": "./log",
+
+				"LogPath": "./log/service.log.info",
+				"RotateLogPath": "./log/service.log.info.%Y%M%D%H",
+
+				"WfLogPath": "./log/service.log.wf",
+				"RotateWfLogPath": "./log/service.log.wf.%Y%M%D%H",
+
+				"PublicLogPath": "./log/public.log",
+				"RotatePublicLogPath": "./log/public.log.%Y%M%D%H"
+		},
+
+			"ConsoleWriter" :{
+			"On" : true
+		}
+		}`)
 	}
+
 	if err = json.Unmarshal(cnt, &lc); err != nil {
 		return
 	}
